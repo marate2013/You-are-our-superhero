@@ -1,0 +1,64 @@
+import java.util.ArrayList;
+class TransitCalculator {
+  
+  //NYS transit system here:
+  double[] price = {2.75, 33, 127};
+  String[] name = {"Pay-per-ride", "7-day Unlimited Rides", "30-day Unlimited Rides"};
+  int[] period = {1, 7, 30};
+
+  //Метод вычисляет, сколько стоит одна поездка на семидневном безлимитном проездном; вводится количество дней эксплуатации проездного и количество поездок, которое планируется сделать с течении указанного периода; если длительность периода превышает срок действия проедного, "докупается" второй такой-же проездной
+  public double unlimited7Price(double days, double rides) {
+    double periods = (double)Math.ceil(days / period[1]);
+    double overallPrice = (price[1] * periods) / rides;
+    overallPrice = overallPrice * 100;
+    int i = (int) Math.round(overallPrice);
+    overallPrice = (double)i / 100;
+    return overallPrice;
+  }
+    //Метод вычисляет, сколько стоит одна поездка на тридцатидневном безлимитном проездном; вводится количество дней эксплуатации проездного и количество поездок, которое планируется сделать с течении указанного периода; если длительность периода превышает срок действия проедного, "докупается" второй такой-же проездной
+    public double unlimited30Price(double days, double rides) {
+    double periods = (double)Math.ceil(days / period[2]);
+    double overallPrice = (price[2] * periods) / rides;
+    overallPrice = overallPrice * 100;
+    int i = (int) Math.round(overallPrice);
+    overallPrice = (double)i / 100;
+    return overallPrice;
+  }
+  
+  //заносим в массив стоимость одной поездки по одноразовому билету, семидневному проездному и тридцатидневному проездному
+  public double[] getRidePrices(double numberOfDays, double numberOfRides){
+    double[] ridePrices = {price[0], unlimited7Price(numberOfDays, numberOfRides), unlimited30Price(numberOfDays, numberOfRides)};
+    return ridePrices;
+  }
+  
+  //выбираем самый оптимальный проездной
+  public String getBestFare(double ddd, double rrr){
+    double bestFare = price[0];
+    String bestRide = "1";
+    getRidePrices(ddd, rrr);
+    
+    for (double num : double[] ridePrices) {
+      if (num < bestFare) {
+        bestFare = num;
+      }
+    }
+    return "You should get the " + bestRide + " at $" + bestFare + " per ride.";
+    
+      
+    
+  }
+  
+  
+  public static void main(String[] args) {
+    
+    //"забираем" дни и поездки из терминала; сперва дни, потом поездки
+    int numbersDays = Integer.parseInt(args[0]);
+    int numbersRides = Integer.parseInt(args[1]);
+    
+    //some tests here:
+    TransitCalculator marat7 = new TransitCalculator();
+    System.out.println(marat7.getBestFare(numbersDays, numbersRides));
+
+    
+  }
+}
