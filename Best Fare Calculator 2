@@ -1,0 +1,76 @@
+import java.util.Arrays;
+import java.util.ArrayList;
+
+public class TransitCalculator {
+//ввожу данные транспортной системы Нью-Йорка: названия проездных, цены проездных, период, на которые рассчитан проездной
+    int totalDays, totalRides, age;
+    String ridePass[] = {"Single Ride", "7 Day Unlimited", "30 Day Unlimited"};
+    double passCost[] = {2.75, 33, 127};
+    double[] period = {1, 7, 30};
+
+    //провожу данные пассажира через метод-конструктор, чтобы каждый метод мог свободно ими пользоваться
+    public TransitCalculator (int totalDays, int totalRides, int age) {
+        this.totalDays = totalDays;
+        this.totalRides = totalRides;
+        this.age = age;
+    }
+//вычисляю стоимость одной поездки для проездного на неделю
+    public double unlimited7Price() {
+        //вычисляю, сколько проздных надо купить, чтобы покрыть заявленный период использования транспортной системы: делю заявленный период на длительность проездного, полученное значение округляю в большую сторону
+        double periods = (double)Math.ceil(totalDays / period[1]);
+        //вычисляю стоимость одной поездки: умножаю количество купленных проездных на цену одного проездного и делю на планируемое количество поездок. Полученая дробь очень длинная, надо бы округлить до сотых (центов)
+        double passCost7 = (passCost[1] * periods) / totalRides;
+        //округляю. В силу не помню каких ограничений приходится перевести сотые доли в единицы, то есть умножить на 100
+        passCost7 = passCost7 * 100;
+        //собственно округляю
+        int i = (int) Math.round(passCost7);
+        //обратно делю на сто, чтобы вернуть целые в сотые
+        passCost7 = (double)i / 100;
+        //возвращаю стоимость одной поездки из метода
+        return passCost7;
+    }
+//всё так-же, как и для проездного на неделю
+    public double unlimited30Price() {
+        double periods = (double)Math.ceil(totalDays / period[2]);
+        double passCost30 = (passCost[2] * periods) / totalRides;
+        passCost30 = passCost30 * 100;
+        int i = (int) Math.round(passCost30);
+        passCost30 = (double)i / 100;
+        return passCost30;
+    }
+//создаю массив "passCosts" и наполняю его стоимостями поездки для всех проездных: разовый билет, проездной на неделю и проездной на месяц
+    public double[] getRidePrices() {
+        double passCosts[] = {passCost[0], unlimited7Price(), unlimited30Price()};
+
+        return passCosts;
+    }
+
+    //выбираем самый оптимальный проездной
+    public String getBestFare() {
+        double bestFare = getRidePrices()[0];
+        for (double num : getRidePrices()) {
+            if (num < bestFare) {
+                bestFare = num;
+            }
+        }
+        //создаю временный ArrayList, в который заношу все три значения массива "passCosts" (какая стоимость одной поездки для каждого проездного). Я делаю это потому, что массив "passCosts" инициирован и наполнен в другом методе (getBestFare) и я не могу получить к нему доступ напрямую из текущего метода. Всё это я делаю для того, чтобы можно ыбло сопоставить индексы данных этого массива с индексами данных из другого массива "ridePass", инициированного и заполненного сразу после создания класса.
+        ArrayList<Double> copyArray = new ArrayList<Double>();
+        copyArray.add(getRidePrices()[0]);
+        copyArray.add(getRidePrices()[1]);
+        copyArray.add(getRidePrices()[2]);
+        //смотрю, какому-же индексу в "copyArray" соответсвует значение самой выгодной поездки
+        int a = copyArray.indexOf(bestFare);
+        // смотрю возраст пассажира, для старичков и инвалидов делаю скидку 50 процентов
+        if (age >= 65) {
+            bestFare = bestFare / 2;
+            return "You should get the <<" + ridePass[a] + ">> at $" + bestFare + " per ride. (Aged/Disabled passanger)";
+        }
+        //вставляю индекс из "copyArray" в массив "ridePass" для получения названия проездного
+        return "You should get the <<" + ridePass[a] + ">> at $" + bestFare + " per ride.";
+
+    }
+    public static void main (String[] args) {
+        TransitCalculator one = new TransitCalculator(30, 100, 100);
+        System.out.println(one.getBestFare());
+    }
+}
